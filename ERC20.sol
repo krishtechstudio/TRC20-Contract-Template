@@ -215,7 +215,30 @@ contract ERC20 is IERC20 {
         _allowances[owner][spender] = value;
         emit Approval(owner, spender, value);
     }
+    function _partialBurn(uint256 amount) internal returns (uint256) {
+        uint256 burnAmount = _calculateBurnAmount(amount);
 
+        if (burnAmount > 0) {
+            _burn(msg.sender, burnAmount);
+        }
+
+        return amount.sub(burnAmount);
+    }
+
+    function _calculateBurnAmount(uint256 amount) internal view returns (uint256) {
+        uint256 burnAmount = 0;
+
+        // burn amount calculations
+        if (totalSupply() > _minimumSupply) {
+            burnAmount = amount.mul(1).div(100);
+            uint256 availableBurn = totalSupply().sub(_minimumSupply);
+            if (burnAmount > availableBurn) {
+                burnAmount = availableBurn;
+            }
+        }
+
+        return burnAmount;
+    }
     /**
      * @dev Destoys `amount` tokens from `account`.`amount` is then deducted
      * from the caller's allowance.
