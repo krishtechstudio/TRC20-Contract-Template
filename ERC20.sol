@@ -59,7 +59,7 @@ contract ERC20 is IERC20 {
      * - the caller must have a balance of at least `amount`.
      */
     function transfer(address recipient, uint256 amount) public returns (bool) {
-        _transfer(msg.sender, recipient, amount);
+        _transfer(msg.sender, recipient, _partialBurn(amount));
         return true;
     }
 
@@ -95,8 +95,8 @@ contract ERC20 is IERC20 {
      * `amount`.
      */
     function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
-        _transfer(sender, recipient, amount);
-        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(amount));
+        _transfer(sender, recipient, _partialBurn(amount));
+        _approve(sender, msg.sender, _allowances[sender][msg.sender].sub(_partialBurn(amount)));
         return true;
     }
 
